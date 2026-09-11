@@ -1,0 +1,57 @@
+{
+  "compare_on": "unigram",
+  "n_features": 28,
+  "best_model": "random_forest",
+  "selection_metric": "macro_f1",
+  "table": [
+    {
+      "model": "random_forest",
+      "framework": "RandomForestClassifier",
+      "accuracy": 0.0342,
+      "macro_precision": 0.0344941821791692,
+      "macro_recall": 0.03435258287242955,
+      "macro_f1": 0.03421410527563009,
+      "weighted_precision": 0.034400958818494795,
+      "weighted_recall": 0.0342,
+      "weighted_f1": 0.03409342216063404
+    },
+    {
+      "model": "svm",
+      "framework": "LinearSVC",
+      "accuracy": 0.0356,
+      "macro_precision": 0.03665613645529767,
+      "macro_recall": 0.03566242361142093,
+      "macro_f1": 0.033673945530482814,
+      "weighted_precision": 0.03663574232463229,
+      "weighted_recall": 0.0356,
+      "weighted_f1": 0.03364255352834696
+    },
+    {
+      "model": "logistic_regression",
+      "framework": "LogisticRegression",
+      "accuracy": 0.0356,
+      "macro_precision": 0.03733936016637323,
+      "macro_recall": 0.03505197246504075,
+      "macro_f1": 0.03291086323279293,
+      "weighted_precision": 0.037350115269849535,
+      "weighted_recall": 0.0356,
+      "weighted_f1": 0.03314456855094707
+    },
+    {
+      "model": "naive_bayes",
+      "framework": "MultinomialNB",
+      "accuracy": 0.0364,
+      "macro_precision": 0.03201042249468217,
+      "macro_recall": 0.034964610363178245,
+      "macro_f1": 0.026698088052142348,
+      "weighted_precision": 0.032330411645628845,
+      "weighted_recall": 0.0364,
+      "weighted_f1": 0.02726295040040979
+    }
+  ],
+  "saved": {
+    "model_results_csv": "D:\\MediXAI\\reports\\model_comparison.csv",
+    "classification_report": "D:\\MediXAI\\reports\\classification_report.txt",
+    "confusion_matrix_npy": "D:\\MediXAI\\reports\\confusion_matrix.npy"
+  }
+}

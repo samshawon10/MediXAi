@@ -1,0 +1,36 @@
+                        precision    recall  f1-score   support
+
+               Allergy     0.0513    0.0465    0.0488       172
+                Anemia     0.0359    0.0491    0.0415       163
+               Anxiety     0.0134    0.0110    0.0121       182
+             Arthritis     0.0241    0.0223    0.0232       179
+                Asthma     0.0160    0.0192    0.0175       156
+            Bronchitis     0.0468    0.0468    0.0468       171
+              COVID-19     0.0400    0.0357    0.0377       168
+Chronic Kidney Disease     0.0523    0.0497    0.0510       161
+           Common Cold     0.0631    0.0870    0.0731       161
+              Dementia     0.0233    0.0242    0.0237       165
+            Depression     0.0357    0.0349    0.0353       172
+            Dermatitis     0.0426    0.0351    0.0385       171
+              Diabetes     0.0311    0.0353    0.0331       170
+              Epilepsy     0.0191    0.0181    0.0186       166
+        Food Poisoning     0.0214    0.0172    0.0191       174
+             Gastritis     0.0237    0.0248    0.0242       161
+         Heart Disease     0.0305    0.0311    0.0308       161
+          Hypertension     0.0214    0.0241    0.0227       166
+                   IBS     0.0328    0.0361    0.0344       166
+             Influenza     0.0476    0.0424    0.0449       165
+         Liver Disease     0.0108    0.0120    0.0114       166
+              Migraine     0.0511    0.0409    0.0455       171
+               Obesity     0.0294    0.0305    0.0299       164
+           Parkinson's     0.0355    0.0303    0.0327       165
+             Pneumonia     0.0267    0.0301    0.0283       166
+             Sinusitis     0.0451    0.0377    0.0411       159
+                Stroke     0.0443    0.0443    0.0443       158
+      Thyroid Disorder     0.0255    0.0292    0.0272       171
+          Tuberculosis     0.0438    0.0368    0.0400       163
+                 Ulcer     0.0506    0.0479    0.0492       167
+
+              accuracy                         0.0342      5000
+             macro avg     0.0345    0.0344    0.0342      5000
+          weighted avg     0.0344    0.0342    0.0341      5000

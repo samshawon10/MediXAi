@@ -1,0 +1,161 @@
+{
+  "dataset": "D:\\MediXAI\\ml\\data\\Healthcare.csv",
+  "n_train": 20000,
+  "n_test": 5000,
+  "n_features": 28,
+  "n_classes": 30,
+  "classes": [
+    "Allergy",
+    "Anemia",
+    "Anxiety",
+    "Arthritis",
+    "Asthma",
+    "Bronchitis",
+    "COVID-19",
+    "Chronic Kidney Disease",
+    "Common Cold",
+    "Dementia",
+    "Depression",
+    "Dermatitis",
+    "Diabetes",
+    "Epilepsy",
+    "Food Poisoning",
+    "Gastritis",
+    "Heart Disease",
+    "Hypertension",
+    "IBS",
+    "Influenza",
+    "Liver Disease",
+    "Migraine",
+    "Obesity",
+    "Parkinson's",
+    "Pneumonia",
+    "Sinusitis",
+    "Stroke",
+    "Thyroid Disorder",
+    "Tuberculosis",
+    "Ulcer"
+  ],
+  "ngram_range": [
+    1,
+    1
+  ],
+  "random_state": 42,
+  "test_size": 0.2,
+  "models": {
+    "naive_bayes": {
+      "framework": "MultinomialNB"
+    },
+    "logistic_regression": {
+      "framework": "LogisticRegression"
+    },
+    "svm": {
+      "framework": "LinearSVC"
+    },
+    "random_forest": {
+      "framework": "RandomForestClassifier"
+    }
+  },
+  "top_features": [
+    {
+      "token": "sneezing",
+      "mean_tfidf": 0.0811
+    },
+    {
+      "token": "appetite loss",
+      "mean_tfidf": 0.0802
+    },
+    {
+      "token": "headache",
+      "mean_tfidf": 0.0802
+    },
+    {
+      "token": "muscle pain",
+      "mean_tfidf": 0.0801
+    },
+    {
+      "token": "fever",
+      "mean_tfidf": 0.08
+    },
+    {
+      "token": "blurred vision",
+      "mean_tfidf": 0.0797
+    },
+    {
+      "token": "swelling",
+      "mean_tfidf": 0.0794
+    },
+    {
+      "token": "anxiety",
+      "mean_tfidf": 0.0793
+    },
+    {
+      "token": "vomiting",
+      "mean_tfidf": 0.0793
+    },
+    {
+      "token": "sore throat",
+      "mean_tfidf": 0.0792
+    },
+    {
+      "token": "depression",
+      "mean_tfidf": 0.0792
+    },
+    {
+      "token": "weight loss",
+      "mean_tfidf": 0.0791
+    },
+    {
+      "token": "tremors",
+      "mean_tfidf": 0.0791
+    },
+    {
+      "token": "cough",
+      "mean_tfidf": 0.079
+    },
+    {
+      "token": "nausea",
+      "mean_tfidf": 0.0789
+    },
+    {
+      "token": "back pain",
+      "mean_tfidf": 0.0788
+    },
+    {
+      "token": "sweating",
+      "mean_tfidf": 0.0788
+    },
+    {
+      "token": "joint pain",
+      "mean_tfidf": 0.0786
+    },
+    {
+      "token": "diarrhea",
+      "mean_tfidf": 0.0786
+    },
+    {
+      "token": "weight gain",
+      "mean_tfidf": 0.0786
+    },
+    {
+      "token": "fatigue",
+      "mean_tfidf": 0.0785
+    },
+    {
+      "token": "runny nose",
+      "mean_tfidf": 0.0785
+    },
+    {
+      "token": "rash",
+      "mean_tfidf": 0.0783
+    },
+    {
+      "token": "shortness of breath",
+      "mean_tfidf": 0.0783
+    },
+    {
+      "token": "dizziness",
+      "mean_tfidf": 0.0782
+    }
+  ]
+}

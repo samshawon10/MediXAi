@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# ML artifacts
+ml/models/*.joblib
+ml/models/*.npy
+
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+*.log
+
+# Data (real dataset is large / not committed)
+ml/data/*.csv
+!ml/data/README.md
