@@ -56,11 +56,22 @@ def evaluate_all(evaluate_on: str = "unigram") -> dict:
     X_te, y_te, class_names, prep = _prepare(evaluate_on)
     fitted = load_fitted()
 
-    n_feat = int(prep["input_shape"])
+    # Equal dimensions alone do not establish compatible feature ordering or IDF.
     try:
-        vocab = set(list(prep.get("feature_names", []) or []))
-    except Exception:
-        vocab = set()
+        saved_vec = joblib.load(config.TFIDF_VECTORIZER_PATH)
+        saved_labels = joblib.load(config.LABEL_ENCODER_PATH)
+        aligned = (
+            np.array_equal(saved_vec.get_feature_names_out(), prep["feature_names"])
+            and np.allclose(saved_vec.idf_, prep["vectorizer"].idf_)
+            and np.array_equal(saved_labels.classes_, class_names)
+        )
+    except (OSError, ValueError):
+        aligned = False
+    if not aligned:
+        fitted = {}
+
+    n_feat = int(prep["input_shape"])
+    vocab = set(prep["feature_names"])
     compatible = {}
     for name, model in fitted.items():
         expected = getattr(model, "n_features_in_", None)
@@ -98,12 +109,14 @@ def evaluate_all(evaluate_on: str = "unigram") -> dict:
             "weighted_f1": f1_score(y_te, y_pred, average="weighted", zero_division=0),
         })
 
-    df = pd.DataFrame(rows).sort_values(config.RANK_METRIC, ascending=False)
+    df = pd.DataFrame(rows).sort_values([config.RANK_METRIC, "macro_recall"], ascending=False)
     df.to_csv(config.MODEL_RESULTS_CSV, index=False)
 
     best_name = str(df.iloc[0]["model"])
     best_model = fitted[best_name]
     joblib.dump(best_model, config.BEST_MODEL_PATH)
+    from .artifacts import write_metadata
+    write_metadata(prep, best_model, best_name)
 
     best_y_pred = predictions[best_name]
     report_txt = classification_report(

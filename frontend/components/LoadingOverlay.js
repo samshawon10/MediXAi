@@ -1,12 +1,15 @@
+import { usePreferences } from "@/context/PreferencesContext";
+import { Check, Circle, LoaderCircle } from "lucide-react";
+
 export default function LoadingOverlay({ stages, activeStage }) {
+  const { t } = usePreferences();
   return (
-    <div className="analysis" role="status" aria-live="polite" aria-label="Analysis in progress">
+    <div className="analysis" role="status" aria-live="polite" aria-label={t("loading.label")}>
       <div className="analysis__head">
         <div className="spinner" aria-hidden="true" />
-        <h2 style={{ fontSize: "1.3rem" }}>Analyzing symptoms&hellip;</h2>
+        <h2 style={{ fontSize: "1.3rem" }}>{t("loading.title")}</h2>
         <p className="muted small" style={{ marginTop: "0.5rem" }}>
-          Previewing the MediXAI analysis sequence. Live results appear after ML
-          API integration.
+          {t("loading.text")}
         </p>
       </div>
       <ol className="stages">
@@ -19,12 +22,12 @@ export default function LoadingOverlay({ stages, activeStage }) {
               className={`stage${done ? " stage--done" : ""}${active ? " stage--active" : ""}`}
             >
               <span className="stage__icon" aria-hidden="true">
-                {done ? "\u2713" : active ? "\u27F3" : "\u2022"}
+                {done ? <Check size={16} strokeWidth={2.3} /> : active ? <LoaderCircle size={16} className="stage__loading" /> : <Circle size={11} />}
               </span>
-              <span>{s.label}</span>
+              <span>{t("loading.stage")}</span>
               {active && (
                 <span className="muted small" style={{ marginLeft: "auto" }}>
-                  working&hellip;
+                  {t("loading.working")}
                 </span>
               )}
             </li>

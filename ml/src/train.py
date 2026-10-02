@@ -125,7 +125,6 @@ def train_all(
 
 def discover_features(prep: dict, top_k: int = 25) -> list:
     """Rank the most informative unigram tokens by average TF-IDF magnitude."""
-    vec = prep["vectorizer"]
     names = prep["feature_names"]
     X = prep["X_train"]
     # Mean tf-idf per feature across the training set (excluding zeros).
@@ -146,7 +145,6 @@ def main(raw_path: Optional[str] = None, ngram_range=(1, 1), min_df: int = 1) ->
     summary = result["summary"]
 
     if summary["models"]:
-        names = list(summary["models"])
         summary["top_features"] = discover_features(result["prep"], top_k=25)
 
     (config.REPORTS_DIR / "train_summary.json").write_text(
