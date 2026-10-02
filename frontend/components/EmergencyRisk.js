@@ -1,47 +1,52 @@
-import ProductBadge from "./ProductBadge";
+import { usePreferences } from "@/context/PreferencesContext";
+import { AlertTriangle } from "lucide-react";
 
-const LEVELS = ["Low Risk", "Moderate Risk", "High Risk", "Emergency"];
-
-/**
- * Emergency risk section. The visual levels are implemented now, but no risk
- * level is assigned until the real risk engine exists.
- */
-export default function EmergencyRisk({ level = null }) {
+export default function EmergencyRisk({ risk }) {
+  const { t } = usePreferences();
+  const urgent = risk?.urgent || ["HIGH", "CRITICAL"].includes(risk?.level);
+  const levelKey = { critical: "risk.critical", high: "risk.high", unassessed: "risk.unassessed" };
+  const phraseTranslations = {
+    "severe breathing difficulty": "risk.severeBreathing",
+    "severe chest pain": "risk.severeChest",
+    "loss of consciousness": "risk.lossConsciousness",
+    "severe bleeding": "risk.severeBleeding",
+    "blue lips": "risk.blueLips",
+    seizure: "risk.seizure",
+    "sudden weakness": "risk.suddenWeakness",
+    "sudden confusion": "risk.suddenConfusion",
+    "severe allergic reaction": "risk.severeAllergy",
+    "severe trauma": "risk.severeTrauma",
+    "breathing difficulty": "risk.breathing",
+    "chest pain": "risk.chestPain",
+    confusion: "risk.confusion",
+  };
+  const levelText = (level) => t(levelKey[String(level).toLowerCase()] || "result.riskUnavailable");
+  const riskText = (text, kind) => {
+    const known = {
+      guidance: {
+        "These symptoms may require urgent medical attention. Seek immediate professional medical assistance or contact your local emergency service.": "risk.urgentGuidance",
+        "No configured emergency phrases were detected. This does not establish low risk.": "risk.noPhraseGuidance",
+      },
+      limitation: {
+        "This limited academic rule set cannot rule out an emergency. Seek professional care for severe, worsening, or concerning symptoms, regardless of this result.": "risk.limitation",
+      },
+      context: {
+        "Mentions are flagged conservatively, including negated or historical mentions; this rule set cannot reliably interpret context.": "risk.context",
+      },
+    };
+    if (known[kind]?.[text]) return t(known[kind][text]);
+    return text;
+  };
   return (
-    <section className="locked" aria-label="Emergency risk assessment">
-      <div className="locked__head">
-        <h3>
-          <span className="lock-icon" aria-hidden="true">&#9888;&#65039;</span>
-          Emergency Risk Prediction
-        </h3>
-        <ProductBadge status="dev" />
-      </div>
-
-      <div className="chips" style={{ borderColor: "var(--line-strong)", background: "var(--surface)" }}>
-        {LEVELS.map((lv) => (
-          <span
-            key={lv}
-            className="chip"
-            style={{ background: "var(--slate-100)", color: "var(--ink-600)", borderColor: "var(--line-strong)" }}
-          >
-            {lv}
-          </span>
-        ))}
-      </div>
-
-      <p style={{ marginTop: "1rem" }}>
-        This module is currently under development and will be enabled in the next
-        update. No risk level has been assigned to this analysis.
-      </p>
-
-      <div className="disclaimer disclaimer--bare" role="note">
-        <span aria-hidden="true">&#9888;&#65039;</span>
-        <span>
-          If you are experiencing severe or rapidly worsening symptoms, seek
-          immediate professional medical assistance. MediXAI is not a replacement
-          for emergency services.
-        </span>
-      </div>
+    <section className={`card risk-card${urgent ? " risk-card--urgent" : ""}`} aria-label={t("result.emergency")} role={urgent ? "alert" : undefined}>
+      <h3 className="icon-heading"><AlertTriangle size={20} aria-hidden="true" />{t("result.emergency")}</h3>
+      <p className="risk-level">{risk?.level ? levelText(risk.level) : t("result.riskUnavailable")}</p>
+      <p className="small muted">{t("result.riskNote")}</p>
+      <p className={urgent ? "risk-guidance" : ""}>{!risk?.available ? t("result.guidanceUnavailable") : risk?.guidance ? riskText(risk.guidance, "guidance") : t("result.guidanceUnavailable")}</p>
+      {risk?.reasons?.length > 0 && <><h4>{t("result.indicators")}</h4><ul>{risk.reasons.map((r) => <li key={r.symptom}>{t(phraseTranslations[r.symptom] || "") || r.symptom} · {levelText(r.level)}</li>)}</ul></>}
+      <p>{risk?.limitation ? riskText(risk.limitation, "limitation") : t("result.riskLimit")}</p>
+      {risk?.contextNote && <p className="small muted">{riskText(risk.contextNote, "context")}</p>}
+      <details className="disclosure"><summary>{t("result.technical")}</summary><p className="small">{t("research.riskText")}</p>{risk?.sources?.map(url => <p className="small" key={url}><a href={url} target="_blank" rel="noreferrer">{url.includes("nhs.uk") ? "NHS" : "MedlinePlus"}: {url.split("/").filter(Boolean).pop()} ↗</a></p>)}</details>
     </section>
   );
 }

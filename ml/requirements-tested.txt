@@ -1,0 +1,18 @@
+# Versions exercised on Python 3.13 during phase 2.
+pandas==3.0.5
+numpy==2.5.3
+scikit-learn==1.9.1
+scipy==1.18.1
+matplotlib==3.11.1
+seaborn==0.13.2
+joblib==1.6.0
+pytest==9.1.1
+fastapi==0.142.2
+uvicorn==0.54.0
+shap==0.52.0
+httpx==0.28.1
+python-dotenv==1.2.4
+pydantic==2.13.5
+starlette==1.7.0
+numba==0.68.0
+llvmlite==0.50.0

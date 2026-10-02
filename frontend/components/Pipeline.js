@@ -1,25 +1,27 @@
+import { usePreferences } from "@/context/PreferencesContext";
+
 const FLOW = [
-  { n: "1", label: "Patient Information", sub: "Age, gender, optional demographics" },
-  { n: "2", label: "Symptom Input", sub: "Free-text, EN or Bangla" },
-  { n: "3", label: "Data Preprocessing", sub: "Cleaning & normalization" },
-  { n: "4", label: "TF-IDF Feature Extraction", sub: "Unigram / bigram vectorization" },
-  { n: "5", label: "Machine Learning Model", sub: "NB · Logistic Regression · SVM · RF" },
-  { n: "6", label: "Possible Condition Prediction", sub: "Multiclass decision support" },
-  { n: "7", label: "Explainable AI", sub: "SHAP-based contribution (next update)" },
-  { n: "8", label: "Emergency Risk Assessment", sub: "Risk engine (next update)" },
-  { n: "9", label: "Healthcare Decision Support", sub: "Insights, not diagnosis" },
+  { n: "2", label: "pipeline.input", sub: "pipeline.inputSub" },
+  { n: "3", label: "pipeline.preprocess", sub: "pipeline.preprocessSub" },
+  { n: "4", label: "pipeline.tfidf", sub: "pipeline.tfidfSub" },
+  { n: "5", label: "pipeline.model", sub: "pipeline.modelSub" },
+  { n: "6", label: "pipeline.prediction", sub: "pipeline.predictionSub" },
+  { n: "7", label: "pipeline.explain", sub: "pipeline.explainSub" },
+  { n: "8", label: "pipeline.risk", sub: "pipeline.riskSub" },
+  { n: "9", label: "pipeline.support", sub: "pipeline.supportSub" },
 ];
 
 export default function Pipeline() {
+  const { t } = usePreferences();
   return (
     <ol className="pipeline" style={{ listStyle: "none", margin: 0, padding: 0 }}>
       {FLOW.map((step, i) => (
         <li key={step.n}>
           <div className="pipe-step">
-            <span className="pipe-step__num" aria-hidden="true">{step.n}</span>
+            <span className="pipe-step__num" aria-hidden="true">{i + 1}</span>
             <div className="pipe-step__label">
-              <strong>{step.label}</strong>
-              <div>{step.sub}</div>
+              <strong>{t(step.label)}</strong>
+              <div>{t(step.sub)}</div>
             </div>
           </div>
           {i < FLOW.length - 1 && <div className="pipe-arrow" aria-hidden="true">&#8595;</div>}
