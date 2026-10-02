@@ -14,6 +14,7 @@ import joblib
 
 from . import config
 from .symptom_normalizer import normalize_symptoms
+from .preprocessing import to_feature_text
 
 _TEXT_RE = re.compile(r"[a-zA-Z\u0980-\u09ff]")
 
@@ -32,10 +33,12 @@ def validate_symptoms(symptoms: Union[str, list, None]) -> list:
         if not symptoms.strip():
             raise PredictionError("Symptom input is empty.")
         check = symptoms
-    elif isinstance(symptoms, (list, tuple, set)):
+    elif isinstance(symptoms, (list, tuple)):
         if not symptoms:
             raise PredictionError("Symptom list is empty.")
-        check = " ".join(str(s) for s in symptoms)
+        if not all(isinstance(s, str) for s in symptoms):
+            raise PredictionError("Each symptom must be text.")
+        check = ", ".join(symptoms)
     else:
         raise PredictionError(
             f"Unsupported symptom input type: {type(symptoms).__name__}."
@@ -45,6 +48,8 @@ def validate_symptoms(symptoms: Union[str, list, None]) -> list:
             "No recognisable symptom text found in the input. "
             "Enter words like 'fever', 'cough', or a Bangla symptom."
         )
+    if len(check) > 2000:
+        raise PredictionError("Enter no more than 2000 characters.")
     normalized = normalize_symptoms(check)
     if not normalized:
         raise PredictionError(
@@ -55,7 +60,7 @@ def validate_symptoms(symptoms: Union[str, list, None]) -> list:
 
 
 def _to_feature_text(normalized: list) -> str:
-    return " ".join(t.replace(" ", "_") for t in normalized)
+    return to_feature_text(normalized)
 
 
 def load_artifacts(check_stale: bool = True):
@@ -87,29 +92,20 @@ def predict(
     demographics: Optional[dict] = None,
 ) -> dict:
     """Return a JSON-serialisable prediction result dict."""
-    vectorizer, model, label_encoder = load_artifacts()
-
-    normalized = validate_symptoms(symptoms)
-    X = vectorizer.transform([_to_feature_text(normalized)])
-
-    class_idx = int(model.predict(X)[0])
-    predicted_condition = str(label_encoder.classes_[class_idx])
-
-    confidence: Optional[float] = None
-    if hasattr(model, "predict_proba"):
-        try:
-            proba = model.predict_proba(X)[0]
-            confidence = round(float(proba[class_idx]), 4)
-        except Exception:
-            confidence = None
+    from .inference import InferenceEngine
+    engine = InferenceEngine()
+    output, _, _ = engine.predict(symptoms)
+    predicted_condition = output["prediction"]["condition"]
+    confidence = output["prediction"]["confidence"]
 
     result = {
         "predicted_condition": predicted_condition,
         "condition": predicted_condition,
-        "model": type(model).__name__,
-        "model_name": _model_name_of(model),
+        "model": type(engine.model).__name__,
+        "model_name": _model_name_of(engine.model),
         "confidence": confidence,
-        "normalized_symptoms": normalized,
+        "normalized_symptoms": output["normalizedSymptoms"],
+        "predictions": output["predictions"],
         "demographics_received": bool(demographics),
         "disclaimer": (
             "AI-generated health insight for decision support only. "

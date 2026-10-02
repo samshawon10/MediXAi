@@ -3,15 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --hostname 127.0.0.1",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "next start --hostname 127.0.0.1",
+    "lint": "next lint",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@next/swc-win32-x64-msvc": "^14.2.5",
-    "next": "14.2.5",
+    "firebase": "^12.19.0",
+    "lucide-react": "^1.50.0",
+    "next": "15.5.24",
     "react": "18.3.1",
     "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
+  },
+  "overrides": {
+    "postcss": "8.5.28",
+    "@grpc/grpc-js": "^1.14.0"
   }
 }

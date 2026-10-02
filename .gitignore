@@ -13,7 +13,28 @@ frontend/node_modules/
 frontend/.next/
 frontend/out/
 frontend/build/
+frontend/public/reports/
 *.log
+.venv/
+.runtime/
+.pytest_cache/
+node_modules/
+.env
+.env.*
+!.env.example
+serviceAccountKey.json
+firebase-adminsdk-*.json
+*-firebase-adminsdk-*.json
+**/service-account*.json
+**/firebase-admin*.json
+**/secrets/
+*.pem
+*.p12
+*.key
+.firebase/
+.mongo-data/
+playwright-report/
+test-results/
 
 # Data (real dataset is large / not committed)
 ml/data/*.csv

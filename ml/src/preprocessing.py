@@ -6,7 +6,7 @@ deterministic (fixed random_state) so training and evaluation reproduce exactly.
 """
 from __future__ import annotations
 
-from pathlib import Path
+import functools
 from typing import Optional
 
 import pandas as pd
@@ -21,13 +21,8 @@ from .symptom_normalizer import normalize_symptoms
 _PRESENT = {"1", "1.0", "yes", "true", "y", "present", "positive"}
 
 
-import functools
-
-
 @functools.lru_cache(maxsize=4096)
 def _cached_cell(value: str) -> tuple:
-    from .symptom_normalizer import normalize_symptoms
-
     return tuple(normalize_symptoms(value))
 
 
@@ -36,8 +31,6 @@ def normalize_cell_cached(value) -> list:
     if value is None:
         return []
     try:
-        import pandas as pd
-
         if pd.isna(value):
             return []
     except Exception:
@@ -68,12 +61,12 @@ def build_symptom_text(df: pd.DataFrame, cat: ColumnCatalog) -> pd.Series:
         for col in cat.symptom_cols:
             for i, value in enumerate(df[col]):
                 if _is_present(value):
-                    per_row[i].append(str(col).strip())
+                    per_row[i].extend(normalize_symptoms(str(col)))
 
     def _join(parts: list[str]) -> str:
         # Underscore keeps multi-word phrases (e.g. "shortness of breath") as a
         # single TF-IDF token while still being displayable.
-        return " ".join(p.replace(" ", "_") for p in parts)
+        return to_feature_text(list(dict.fromkeys(parts)))
 
     return pd.Series([_join(p) for p in per_row], index=df.index)
 
@@ -110,17 +103,17 @@ def prepare_train_test(
     if y_raw.nunique() < 2:
         raise ValueError("Label column must contain at least 2 classes.")
 
-    label_encoder = LabelEncoder()
-    y_enc = label_encoder.fit_transform(y_raw)
-
     # Stratified split because this is multiclass classification.
-    X_text_tr, X_text_te, y_tr, y_te = train_test_split(
+    X_text_tr, X_text_te, y_raw_tr, y_raw_te = train_test_split(
         symptom_text,
-        y_enc,
+        y_raw,
         test_size=config.TEST_SIZE,
-        stratify=y_enc,
+        stratify=y_raw,
         random_state=config.RANDOM_STATE,
     )
+    label_encoder = LabelEncoder().fit(y_raw_tr)
+    y_tr = label_encoder.transform(y_raw_tr)
+    y_te = label_encoder.transform(y_raw_te)
 
     vectorizer = make_vectorizer(ngram_range=ngram_range, min_df=min_df)
     # Fit vectorizer ONLY on training data (no leakage).
@@ -146,3 +139,8 @@ def prepare_train_test(
         "used_path": str(used),
         "ngram_range": tuple(ngram_range),
     }
+
+
+def to_feature_text(normalized: list[str]) -> str:
+    """Shared feature representation for training, CLI and HTTP inference."""
+    return " ".join(term.replace(" ", "_") for term in normalized)

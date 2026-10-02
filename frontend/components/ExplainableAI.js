@@ -1,43 +1,18 @@
-import ProductBadge from "./ProductBadge";
+import { usePreferences } from "@/context/PreferencesContext";
 
-/**
- * Explainable AI panel. The full layout is built now; real SHAP data will be
- * passed in as props (shapValues, topContributors, summary) in the next update.
- */
-export default function ExplainableAI({ contributingSymptoms = [], shapValues = [] }) {
-  return (
-    <section className="locked" aria-label="Explainable AI">
-      <div className="locked__head">
-        <h3>
-          <span className="lock-icon" aria-hidden="true">&#128274;</span>
-          Why did MediXAI make this prediction?
-        </h3>
-        <ProductBadge status="coming" />
-      </div>
-      {contributingSymptoms.length > 0 ? (
-        <ul>
-          {contributingSymptoms.map((s) => (
-            <li key={s.symptom}>{s.symptom}</li>
-          ))}
-        </ul>
-      ) : (
-        <>
-          <p>
-            <strong className="eyebrow" style={{ display: "inline-flex", marginBottom: "0.5rem" }}>
-              SHAP-based symptom contribution analysis
-            </strong>
-          </p>
-          <p>
-            The top contributing symptoms, feature importance scores, and
-            positive/negative contributions will appear here once the explainable
-            AI engine is integrated in the next update.
-          </p>
-          <p className="small muted">
-            This component is already designed to receive real SHAP data as props
-            or from the API response &mdash; no UI redesign will be required.
-          </p>
-        </>
-      )}
-    </section>
-  );
+export default function ExplainableAI({ explanation }) {
+  const { t } = usePreferences();
+  const features = explanation?.features || [];
+  const max = Math.max(...features.map(f => Math.abs(f.impact)), 0.000001);
+  return <section className="card" aria-label={t("result.why")}><h3>{t("result.why")}</h3>
+    {!explanation?.available ? <p>{t("result.explanationFallback")}</p> : <>
+      <p className="small muted">{t("result.simple")}</p>
+      <ul className="shap-chart">{features.map(f => <li key={f.feature}><div className="shap-label"><strong>{f.feature}</strong><span>{f.impact >= 0 ? "+" : "−"} {t(`result.${f.direction}Short`)}</span></div>
+        <div className="shap-track" role="img" aria-label={t("result.featureImpactLabel").replace("{feature}", f.feature).replace("{direction}", t(`result.${f.direction}Direction`)).replace("{impact}", f.impact.toFixed(5))}><span className={`shap-bar shap-bar--${f.direction}`} style={{ width: `${Math.abs(f.impact) / max * 100}%` }} /></div></li>)}</ul>
+      <p className="small muted">{t("result.positive")}</p>
+      <details className="disclosure"><summary>{t("result.technical")}</summary><p className="small">{explanation.explainer} · {t("result.units")} {explanation.units}</p>
+        <div className="table-scroll" tabIndex={0} role="region" aria-label={t("result.value")}><table><thead><tr><th scope="col">{t("result.feature")}</th><th scope="col">{t("result.value")}</th><th scope="col">{t("result.direction")}</th></tr></thead><tbody>{features.map(f => <tr key={f.feature}><th scope="row">{f.feature}</th><td>{f.impact.toFixed(6)}</td><td>{t(`result.${f.direction}Short`)}</td></tr>)}</tbody></table></div>
+        <dl className="technical-values">{[["baseline", explanation.baseValue], ["absent", explanation.absentFeatureImpact], ["output", explanation.outputValue]].map(([key, value]) => <div key={key}><dt>{t(`result.${key}`)}</dt><dd>{Number.isFinite(value) ? value.toFixed(6) : t("common.unavailable")}</dd></div>)}</dl>
+      </details>
+    </>}<p className="small mt-1">{t("result.shap")}</p></section>;
 }

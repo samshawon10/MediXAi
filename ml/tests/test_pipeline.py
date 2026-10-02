@@ -24,7 +24,18 @@ def test_validate_symptoms_accepts_normal_text():
     assert "fever" in out and "cough" in out
 
 
-def test_full_pipeline_produces_prediction():
+def test_full_pipeline_produces_prediction(tmp_path, monkeypatch):
+    # Keep the legacy integration check isolated from real models and reports.
+    from src import config
+    monkeypatch.setattr(config, "MODELS_DIR", tmp_path)
+    monkeypatch.setattr(config, "REPORTS_DIR", tmp_path)
+    for key, name in {
+        "TFIDF_VECTORIZER_PATH": "tfidf_vectorizer.joblib",
+        "LABEL_ENCODER_PATH": "label_encoder.joblib",
+        "BEST_MODEL_PATH": "best_model.joblib",
+        "MODEL_RESULTS_CSV": "model_comparison.csv",
+    }.items():
+        monkeypatch.setattr(config, key, tmp_path / name)
     # Train using a temp synthetic dataset (fast), returns a prediction dict.
     with tempfile.TemporaryDirectory() as td:
         from pathlib import Path

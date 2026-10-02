@@ -15,8 +15,7 @@ export default function useSymptomInput() {
 
   const addMany = useCallback(
     (items) => {
-      const additions = items
-        .map((s) => s.trim().toLowerCase())
+      const additions = [...new Set(items.map((s) => s.trim().toLowerCase()))]
         .filter((s) => s && !chips.includes(s));
       if (additions.length) setChips((prev) => [...prev, ...additions]);
       return additions;
@@ -53,23 +52,9 @@ export default function useSymptomInput() {
 
   const clearAll = useCallback(() => {
     setChips([]);
+    setText("");
     setError("");
   }, []);
-
-  const validate = useCallback(() => {
-    if (chips.length === 0) {
-      if (!text.trim()) {
-        setError("Please add at least one symptom to analyze.");
-        return false;
-      }
-      const added = addFromText(text);
-      if (added.length === 0) {
-        setError("Please add at least one symptom to analyze.");
-        return false;
-      }
-    }
-    return true;
-  }, [chips.length, text, addFromText]);
 
   return {
     chips,
@@ -81,7 +66,5 @@ export default function useSymptomInput() {
     addSingle,
     remove,
     clearAll,
-    validate,
-    hasSymptoms: chips.length > 0,
   };
 }

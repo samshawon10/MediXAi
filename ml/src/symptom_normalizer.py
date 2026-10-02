@@ -10,10 +10,13 @@ coverage or automated Bangla->English translation of arbitrary text.
 from __future__ import annotations
 
 import re
+import unicodedata
 from typing import Iterable, List, Union
 
 # Bangla -> canonical English
 BANGLA_TO_ENGLISH: dict[str, str] = {
+    "শুকনা কাশি": "cough",
+    "শুকনো কাশি": "cough",
     "জ্বর": "fever",
     "কাশি": "cough",
     "মাথা ব্যথা": "headache",
@@ -48,6 +51,11 @@ BANGLA_TO_ENGLISH: dict[str, str] = {
 
 # English variant / synonym -> canonical English
 ENGLISH_CANONICAL: dict[str, str] = {
+    "head pain": "headache",
+    "high fever": "fever",
+    "dry cough": "cough",
+    "feaver": "fever",
+    "diarrhoea": "diarrhea",
     "head ache": "headache",
     "head-ache": "headache",
     "headaches": "headache",
@@ -61,7 +69,8 @@ ENGLISH_CANONICAL: dict[str, str] = {
     "stomach ache": "abdominal pain",
     "sorethroat": "sore throat",
     "throat pain": "sore throat",
-    "body ache": "body pain",
+    "body pain": "muscle pain",
+    "body ache": "muscle pain",
     "tiredness": "fatigue",
     "exhaustion": "fatigue",
     "sleeplessness": "insomnia",
@@ -76,7 +85,7 @@ ENGLISH_CANONICAL: dict[str, str] = {
     "yellow urine": "yellowing of urine",
 }
 
-_SEPARATOR_RE = re.compile(r"[/\\]|\band\b|&|,|;|\t|\||\n")
+_SEPARATOR_RE = re.compile(r"[/\\]|\band\b|\bও\b|&|,|;|[.!?।]|\t|\||\n", re.IGNORECASE)
 _WS_RE = re.compile(r"\s+")
 _PUNCT_EDGE_RE = re.compile(r"^[^\w\u0980-\u09ff]+|[^\w\u0980-\u09ff]+$")
 _SPACE = "\x00"
@@ -86,7 +95,7 @@ def normalize_text(text: str) -> str:
     """Lowercase + strip punctuation edges + collapse whitespace."""
     if text is None:
         return ""
-    text = str(text).lower()
+    text = unicodedata.normalize("NFC", str(text)).lower()
     text = _SEPARATOR_RE.sub(" ", text)
     text = text.replace("_", " ")
     text = _WS_RE.sub(" ", text).strip()
@@ -95,7 +104,7 @@ def normalize_text(text: str) -> str:
 
 
 def _strip_articles(key: str) -> str:
-    for token in ("i have ", "having ", "feeling ", "feel "):
+    for token in ("i have ", "having ", "feeling ", "feel ", "আমার "):
         if key.startswith(token):
             key = key[len(token):].strip()
             break
@@ -114,7 +123,7 @@ def normalize_symptom(term: str) -> str:
     if not raw:
         return ""
 
-    bn_key = normalize_text(raw)
+    bn_key = _strip_articles(normalize_text(raw))
     bn_hit = _BN_LOOKUP.get(bn_key)
     if bn_hit is not None:
         return bn_hit
